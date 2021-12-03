@@ -2,6 +2,9 @@
 
 Web apps for checking `noiseSuppression` effectiveness for WebRTC communication.
 
+* site
+  - https://noisesuppression-checker.netlify.app/
+
 ## dev
 
 ```
