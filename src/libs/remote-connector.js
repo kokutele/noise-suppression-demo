@@ -30,6 +30,7 @@ export default class RemoteConnector extends EventEmitter {
     }
 
     this.emit( 'update:settings', _settings )
+    this.emit( 'deviceName', this._getDeviceName() )
   }
 
   /**
@@ -172,6 +173,12 @@ export default class RemoteConnector extends EventEmitter {
     } catch(err) {
       this._emitLog( "error", err.message )
     }
+  }
+
+  _getDeviceName = () => {
+    const [ sender ] = this._pc1.getSenders()
+
+    return sender.track.label
   }
  
   /**

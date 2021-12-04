@@ -9,6 +9,13 @@
   background: #000;
 }
 
+.controller {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0 0.25em;
+}
+
 .panel {
   display: flex;
   flex-direction: row;

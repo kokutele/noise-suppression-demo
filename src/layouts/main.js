@@ -35,10 +35,10 @@ export default function Main( props ) {
   const [ _echoCancellation, setEchoCancellation ] = useState( true )
   const [ _noiseSuppression, setNoiseSuppression ] = useState( true )
   const [ _logs, setLogs ] = useState( [] )
+  const [ _deviceName, setDeviceName ] = useState( '' )
 
   const isNoseSuppressionSupported = useMemo( () => {
     const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
-    console.log( supportedConstraints )
 
     return !!supportedConstraints.noiseSuppression
   }, [])
@@ -76,13 +76,13 @@ export default function Main( props ) {
 
     setStatus( STATUS.CONNECTING )
 
-    const connector = RemoteConnector.create()
+    _connector.current = RemoteConnector.create()
 
-    connector.on("log", obj => {
+    _connector.current.on("log", obj => {
       setLogs( prev => [ ...prev, obj ])
     })
 
-    connector.on('track', track => {
+    _connector.current.on('track', track => {
       if( !_stream.current ) {
         _stream.current = new MediaStream()
         _audioEle.current.srcObject = _stream.current
@@ -94,7 +94,7 @@ export default function Main( props ) {
           _analyzer.current.start( _stream.current, _canvasEle.current )
 
           // hack for safari
-          connector.changeSettings( {} )
+          _connector.current.changeSettings( {} )
           setStatus(STATUS.CONNECTED)
         })
       }
@@ -102,7 +102,7 @@ export default function Main( props ) {
       _stream.current.addTrack( track )
     })
 
-    connector.on('update:settings', settings => {
+    _connector.current.on('update:settings', settings => {
       if( settings.echoCancellation !== undefined ) {
         setEchoCancellation( settings.echoCancellation )
       }
@@ -110,9 +110,11 @@ export default function Main( props ) {
         setNoiseSuppression( settings.noiseSuppression )
       }
     })
-    await connector.start()
 
-    _connector.current = connector
+    _connector.current.on('deviceName', name => {
+      setDeviceName( name )
+    })
+    await _connector.current.start()
   }, [ _status ])
 
   /**
@@ -167,24 +169,33 @@ export default function Main( props ) {
 
   return (
     <div className="Main">
-      <div>
-        <Button 
-          type="primary" 
-          onClick={ async () => {
-            await handleStart()
-            checkAudioSettings()
-          }} 
-          disabled={ _status !== STATUS.IDLE }  
-          danger
-        >start</Button>
-        <Button 
-          type="default" 
-          onClick={ () => {
-            handleStop()
-          }} 
-          disabled={ _status === STATUS.IDLE }  
-          danger
-        >stop</Button>
+      <div className="controller">
+        <div>
+          <Button 
+            type="primary" 
+            onClick={ async () => {
+              await handleStart()
+              checkAudioSettings()
+            }} 
+            disabled={ _status !== STATUS.IDLE }  
+            danger
+          >start</Button>
+        </div>
+        <div>
+          <Button 
+            type="default" 
+            onClick={ () => {
+              handleStop()
+            }} 
+            disabled={ _status === STATUS.IDLE }  
+            danger
+          >stop</Button>
+        </div>
+        { ( _status === STATUS.CONNECTED && !!_deviceName ) && (
+        <div>
+          device: <strong>{_deviceName}</strong>
+        </div>
+        )}
       </div>
       <div>
         <audio ref={ _audioEle } />
