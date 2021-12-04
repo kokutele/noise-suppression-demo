@@ -1,6 +1,7 @@
 import React, { 
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from 'react'
@@ -34,6 +35,19 @@ export default function Main( props ) {
   const [ _echoCancellation, setEchoCancellation ] = useState( true )
   const [ _noiseSuppression, setNoiseSuppression ] = useState( true )
   const [ _logs, setLogs ] = useState( [] )
+
+  const isNoseSuppressionSupported = useMemo( () => {
+    const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
+    console.log( supportedConstraints )
+
+    return !!supportedConstraints.noiseSuppression
+  }, [])
+
+  const isEchoCancellationSupported = useMemo( () => {
+    const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
+
+    return !!supportedConstraints.echoCancellation
+  }, [])
 
   /**
    * canvas size を自動調節する side effect
@@ -178,6 +192,7 @@ export default function Main( props ) {
           <canvas ref={ _canvasEle } ></canvas>
         </div>
         <div className="panel">
+          { isEchoCancellationSupported && (
           <div>
             echoCancellation&nbsp;
             <Switch 
@@ -186,6 +201,8 @@ export default function Main( props ) {
               disabled={ _status !== STATUS.CONNECTED } 
             />
           </div>
+          )}
+          { isNoseSuppressionSupported && (
           <div>
             noiseSuppression&nbsp;
             <Switch 
@@ -194,6 +211,7 @@ export default function Main( props ) {
               disabled={ _status !== STATUS.CONNECTED } 
             />
           </div>
+          )}
         </div>
       </div>
       <Divider />
