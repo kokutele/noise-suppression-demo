@@ -58,6 +58,7 @@ export default class RemoteConnector extends EventEmitter {
       echoCancellation: currentSettings.echoCancellation,
       noiseSuppression: currentSettings.noiseSuppression
     }, settings )
+
     const stream = await this._getStream( _settings )
 
     const [ newTrack ] = stream.getAudioTracks()
@@ -194,6 +195,7 @@ export default class RemoteConnector extends EventEmitter {
    */
   _getStream = async ( settings ) => {
     const _settings = settings || true
+
     return await navigator.mediaDevices.getUserMedia({
       video: false,
       audio: _settings

@@ -61,6 +61,7 @@ export default function Main( props ) {
     if( _status !== STATUS.IDLE ) return
 
     setStatus( STATUS.CONNECTING )
+
     const connector = RemoteConnector.create()
 
     connector.on("log", obj => {
@@ -78,6 +79,8 @@ export default function Main( props ) {
           _analyzer.current = new AudioAnalyser()
           _analyzer.current.start( _stream.current, _canvasEle.current )
 
+          // hack for safari
+          connector.changeSettings( {} )
           setStatus(STATUS.CONNECTED)
         })
       }
@@ -93,7 +96,7 @@ export default function Main( props ) {
         setNoiseSuppression( settings.noiseSuppression )
       }
     })
-    await connector.start( {})
+    await connector.start()
 
     _connector.current = connector
   }, [ _status ])
