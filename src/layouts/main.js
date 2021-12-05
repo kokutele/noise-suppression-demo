@@ -102,8 +102,8 @@ export default function Main( props ) {
         _stream.current = new MediaStream()
         _audioEle.current.srcObject = _stream.current
 
-        _audioEle.current.addEventListener('loadedmetadata', () => {
-          _audioEle.current.play()
+        _audioEle.current.addEventListener('loadedmetadata', async () => {
+          await _audioEle.current.play()
 
           _analyzer.current = new AudioAnalyser()
           _analyzer.current.start( _stream.current, _canvasEle.current )
