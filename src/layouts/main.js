@@ -14,6 +14,7 @@ import {
 
 import RemoteConnector from '../libs/remote-connector'
 import AudioAnalyser from '../libs/audio-analyser'
+import DeviceSelector from '../components/device-selector'
 
 import './main.css'
 
@@ -35,7 +36,9 @@ export default function Main( props ) {
   const [ _echoCancellation, setEchoCancellation ] = useState( true )
   const [ _noiseSuppression, setNoiseSuppression ] = useState( true )
   const [ _logs, setLogs ] = useState( [] )
+  const [ _deviceId, setDeviceId ] = useState( '' )
   const [ _deviceName, setDeviceName ] = useState( '' )
+  const [ _deviceList, setDeviceList ] = useState( [] )
 
   const isNoseSuppressionSupported = useMemo( () => {
     const supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
@@ -62,6 +65,18 @@ export default function Main( props ) {
     window.onresize = fitSize
     fitSize()
   }, [])
+
+  /**
+   * マイクソースリストを取得する side effect
+   * 
+   */
+  useEffect( () => {
+    if ( _status !== STATUS.CONNECTED ) return
+    ( async () => {
+      const list = await navigator.mediaDevices.enumerateDevices()
+      setDeviceList( list.filter( item => item.kind === 'audioinput' ))
+    })()
+  }, [ _status ])
 
   /**
    * start ボタンをクリックしたときのコールバック
@@ -108,6 +123,9 @@ export default function Main( props ) {
       }
       if( settings.noiseSuppression !== undefined ) {
         setNoiseSuppression( settings.noiseSuppression )
+      }
+      if( settings.deviceId !== undefined ) {
+        setDeviceId( settings.deviceId )
       }
     })
 
@@ -203,26 +221,37 @@ export default function Main( props ) {
           <canvas ref={ _canvasEle } ></canvas>
         </div>
         <div className="panel">
-          { isEchoCancellationSupported && (
-          <div>
-            echoCancellation&nbsp;
-            <Switch 
-              onChange={ checked => changeSettings({ echoCancellation: checked }) }
-              checked={ _echoCancellation } 
-              disabled={ _status !== STATUS.CONNECTED } 
+          <div className="panel-item">
+            <DeviceSelector 
+              deviceId={ _deviceId }
+              items={ _deviceList } 
+              disabled={ _status !== STATUS.CONNECTED }
+              onChange={ deviceId => changeSettings( { deviceId } ) }
+              style={{ width: 240 }}
             />
           </div>
-          )}
-          { isNoseSuppressionSupported && (
-          <div>
-            noiseSuppression&nbsp;
-            <Switch 
-              onChange={ checked => changeSettings({ noiseSuppression: checked }) }
-              checked={ _noiseSuppression } 
-              disabled={ _status !== STATUS.CONNECTED } 
-            />
+          <div className="panel-item">
+            { isEchoCancellationSupported && (
+            <div>
+              echoCancellation&nbsp;
+              <Switch 
+                onChange={ checked => changeSettings({ echoCancellation: checked }) }
+                checked={ _echoCancellation } 
+                disabled={ _status !== STATUS.CONNECTED } 
+              />
+            </div>
+            )}
+            { isNoseSuppressionSupported && (
+            <div>
+              noiseSuppression&nbsp;
+              <Switch 
+                onChange={ checked => changeSettings({ noiseSuppression: checked }) }
+                checked={ _noiseSuppression } 
+                disabled={ _status !== STATUS.CONNECTED } 
+              />
+            </div>
+            )}
           </div>
-          )}
         </div>
       </div>
       <Divider />

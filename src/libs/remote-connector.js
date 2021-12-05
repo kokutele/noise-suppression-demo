@@ -26,7 +26,8 @@ export default class RemoteConnector extends EventEmitter {
 
     const _settings = {
       echoCancellation: settings.echoCancellation,
-      noiseSuppression: settings.noiseSuppression
+      noiseSuppression: settings.noiseSuppression,
+      deviceId: settings.deviceId
     }
 
     this.emit( 'update:settings', _settings )
@@ -48,6 +49,7 @@ export default class RemoteConnector extends EventEmitter {
    * @param {object} settings 
    * @param {boolean} [echoCancellation]
    * @param {boolean} [noiseSuppression]
+   * @param {string} [deviceId]
    */
   changeSettings = async settings => {
     const [ sender ] = this._pc1.getSenders()
@@ -56,6 +58,7 @@ export default class RemoteConnector extends EventEmitter {
     sender.track.stop()
 
     const _settings = Object.assign( {}, {
+      deviceId: currentSettings.deviceId,
       echoCancellation: currentSettings.echoCancellation,
       noiseSuppression: currentSettings.noiseSuppression
     }, settings )

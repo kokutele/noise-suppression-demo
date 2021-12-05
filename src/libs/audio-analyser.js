@@ -38,7 +38,7 @@ export default class AudioAnalyser extends EventEmitter {
     this._timeDomainAnalyser.fftSize = 2048
     this._frequencyAnalyser.fftSize = 512
 
-    this._timeDomainArray = new Uint8Array( this._timeDomainAnalyser.frequencyBinCount )
+    this._timeDomainArray = new Uint8Array( this._timeDomainAnalyser.fftSize )
     this._frequencyArray = new Uint8Array( this._frequencyAnalyser.frequencyBinCount )
 
     this._startAnalyse()

@@ -18,11 +18,15 @@
 
 .panel {
   display: flex;
+  flex-direction: column;
+  gap: 0.3em 0;
+}
+.panel-item {
+  display: flex;
   flex-direction: row;
   justify-content: flex-end;
   gap: 0 1em;
 }
-
 
 .logs .line {
   font-size: 0.8em;
