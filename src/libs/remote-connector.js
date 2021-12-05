@@ -139,7 +139,7 @@ export default class RemoteConnector extends EventEmitter {
         this.checkAudioSettings()
       })
 
-      // se4t one-way negotiation ( pc1 -> pc2 )
+      // set one-way negotiation ( pc1 -> pc2 )
       //
       const transceiver1 = this._pc1.addTransceiver('audio')
       transceiver1.direction = 'sendonly'
